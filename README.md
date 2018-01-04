@@ -81,3 +81,9 @@ Work for Ada Developers Academy Capstone Project
   >✔  Firebase initialization complete!`
 
 - When committing Firebase functions, I changed ravelbot/functions/node_modules/@types/body-parser/LICENSE to LF from CRLF... Git wouldn't let me commit.
+- Trying to add Dialogflow Dev API Key to Fiebase Cloud functions.
+  - `firebase functions:config:set dialoglow.key="DEV_KEY"`
+  - `firebase deploy --only functions`
+- In functions folder, added Requestify and CORS
+  - `npm install cors requestify --save`
+-Also install `npm install api-ai-javascript` for Dialogflow package

@@ -100,3 +100,8 @@ initialize firebase in root folder (ravelbot) `firebase init`. Gives lots of opt
 >? What language would you like to use to write Cloud Functions? __JavaScript__
 
 >? Do you want to install dependencies with npm now? __Y__
+
+### Setup index.js for dialogflowProxy
+- in functions `npm install apiai`
+- `firebase deploy`
+  - received url: https://us-central1-ravelbot.cloudfunctions.net/dialogflowProxy

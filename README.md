@@ -105,3 +105,10 @@ initialize firebase in root folder (ravelbot) `firebase init`. Gives lots of opt
 - in functions `npm install apiai`
 - `firebase deploy`
   - received url: https://us-central1-ravelbot.cloudfunctions.net/dialogflowProxy
+
+### Setup chat module in angular
+- `ng g module chat`
+- `ng g service chat -m chat`
+- `ng g component chat/chat-dialog -m chat`
+
+flesh them out, may need to update node packages `npm update`

@@ -16,7 +16,7 @@ export class ChatService {
 
   readonly DIALOGFLOW_URL = 'https://us-central1-ravelbot.cloudfunctions.net/dialogflowProxy';
 
-  constructor(http: HttpClient) { };
+  constructor(private http: HttpClient) { };
 
   // Sends and receives messages via DialogFlow
 
@@ -28,11 +28,9 @@ export class ChatService {
     params = params.set('message', msg);
     //TODO: Set {sessionId} somehow
 
-    const response = this.http.get(this.DIALOGFLOW_URL, { params }).done(
-      const speech = response.result.fulfillment.speech;
-      const botMessage = new Message(speech, 'bot');
-      this.update(botMessage);
-    );
+    const response = this.http.get(this.DIALOGFLOW_URL, { params });
+    const botMessage = new Message(response, 'bot');
+    this.update(botMessage);
   };
   // Adds message to source
   update(msg: Message) {

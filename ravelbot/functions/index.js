@@ -1,8 +1,19 @@
 const functions = require('firebase-functions');
+const dialogflowClient = require('apiai');
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
+
+exports.dialogflowProxy = functions.https.onRequest((request, response) => {
+  const dialogflowKey = functions.config().dialogflow.key;
+  // const message = request.query.message
+  const req = dialogflowClient(dialogflowKey).textRequest('Hi there!', { sessionId: 'someSessionID' });
+
+  req.on('response', (res) => {
+    response.send(res.result.fulfillment.speech);
+  });
+
+  req.on('error', (error) => {
+    response.send(error);
+  });
+
+  req.end();
+});

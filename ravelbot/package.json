@@ -26,6 +26,7 @@
     "jquery": "^3.2.1",
     "requestify": "^0.2.5",
     "rxjs": "^5.5.2",
+    "uuid-random": "^1.0.6",
     "zone.js": "^0.8.14"
   },
   "devDependencies": {

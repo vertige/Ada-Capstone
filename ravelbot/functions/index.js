@@ -8,18 +8,15 @@ exports.dialogflowProxy = functions.https.onRequest((request, response) => {
     const dialogflowKey = functions.config().dialogflow.key;
     // console.log(request.query.message);
     const { query: { message } } = request;
-    const req = dialogflowClient(dialogflowKey).textRequest(message, { sessionId: 'someSessionID' });
+    const { query: { sessionId } } = request;
+    const req = dialogflowClient(dialogflowKey).textRequest(message, { sessionId });
 
     req.on('response', (res) => {
-      console.log("In receiving a response");
       response.send(res.result.fulfillment.speech);
-      console.log(response);
     });
 
     req.on('error', (error) => {
-      console.log("In receiving an error");
       response.send(error);
-      console.log(response);
     });
 
     req.end();

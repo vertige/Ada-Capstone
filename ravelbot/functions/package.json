@@ -12,7 +12,8 @@
     "apiai": "^4.0.3",
     "cors": "^2.8.4",
     "firebase-admin": "~5.4.2",
-    "firebase-functions": "^0.7.1"
+    "firebase-functions": "^0.7.1",
+    "requestify": "^0.2.5"
   },
   "private": true
 }

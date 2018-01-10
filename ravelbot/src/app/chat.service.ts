@@ -25,26 +25,34 @@ export class ChatService {
     const userMessage = new Message(msg, 'user');
     this.update(userMessage);
 
-    this.getResponse(msg).subscribe((reply) => {
-      const botMessage = new Message(reply, 'bot');
+    this.getResponse(msg).subscribe((responseObject) => {
+      let replyText = JSON.parse(responseObject).speech;
+      // TODO: handle various actions here
+      const botMessage = new Message(replyText, 'bot');
       this.update(botMessage);
     });;
   };
 
   // Gets response from dialogflowProxy
   getResponse(msg: string) {
-    // Sets sessionId --TODO: Refactor to elsewhere
+    let params = new HttpParams();
+    params = params.set('message', msg);
+    params = params.set('sessionId', this.session());
+
+
+    return this.http.get(this.DIALOGFLOW_URL, { params,  responseType: 'text' });
+  };
+
+  // TODO: Put actionhandlers here
+
+  // Gets session id
+  session() {
     let sessionId = sessionStorage.getItem('id');
     if (sessionId == null) {
       sessionStorage.setItem('id',uuid());
       sessionId = sessionStorage.getItem('id');
     }
-
-    let params = new HttpParams();
-    params = params.set('message', msg);
-    params = params.set('sessionId', sessionId);
-
-    return this.http.get(this.DIALOGFLOW_URL, { params,  responseType: 'text' })
+    return sessionId;
   };
 
   // Adds message to source

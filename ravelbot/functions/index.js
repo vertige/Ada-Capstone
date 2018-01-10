@@ -5,37 +5,74 @@ const http = require('requestify');
 
 
 exports.dialogflowProxy = functions.https.onRequest((request, response) => {
-  cors(request, response, () => {
-    const dialogflowKey = functions.config().dialogflow.key;
-    // console.log(request.query.message);
-    const { query: { message } } = request;
-    const { query: { sessionId } } = request;
-    const req = dialogflowClient(dialogflowKey).textRequest(message, { sessionId });
+  // // Parameters are any entites that Dialogflow has extracted from the request.
+  // const parameters = req.body.result.parameters;
+  // // Contexts are objects used to track and store conversation state
+  // const inputContexts = req.body.result.contexts;
+  // // Get the request source slack/facebook/et
+  // const requestSource = (req.body.originalRequest) ? req.body.originalRequest.source : undefined
 
-    req.on('response', (res) => {
-      // testing Ravelry calls
-      let ravelry = '';
-      http.get('https://api.ravelry.com/patterns/search.json', {
-        // method: 'GET',
+  const responseObject = {
+    action: 'default',
+    speech: '',
+    attachments: [],
+  };
+
+  const actionHandlers = {
+    ravelryFindPattern: (res) => {
+      const patternName = res.result.parameters['pattern-title'];
+      responseObject.action = 'listPatterns';
+      responseObject.speech =  `These are the top Ravelry search results for ${patternName}`;
+      return http.get('https://api.ravelry.com/patterns/search.json', {
         auth: {
           username: functions.config().ravelry.username,
           password: functions.config().ravelry.password,
         },
         params: {
-          query: 'Brain Hat',
+          query: patternName,
+          page_size: '5',
         },
       })
         .then((ravResponse) => {
-          ravelry = ravResponse.getBody();
-          console.log(ravelry);
+          const patternList = ravResponse.getBody().patterns;
+          for (const pattern of patternList) {
+            responseObject.attachments.push({
+              title: pattern.name,
+              imgURL: pattern.first_photo.small2_url,
+              id: pattern.id,
+              designer: pattern.designer.name,
+            });
+          }
+          return responseObject;
         });
+    },
+    default: (res) => {
+      responseObject.speech = res.result.fulfillment.speech
+      return Promise.resolve(responseObject);
+    },
+  };
 
-      response.send(`${res.result.fulfillment.speech} ACTION: ${res.result.action}`);
+  cors(request, response, () => {
+    const dialogflowKey = functions.config().dialogflow.key;
+    const { query: { message } } = request;
+    const { query: { sessionId } } = request;
+    const req = dialogflowClient(dialogflowKey).textRequest(message, { sessionId });
+
+    req.on('response', (res) => {
+      // An action is a string used to identify what needs to be done in fulfillment
+      let { result: { action } } = res; // let action = res.result.action
+
+      if (!actionHandlers[action]) {
+        action = 'default';
+      }
+
+      actionHandlers[action](res).then(val => response.send(val));
     });
 
     req.on('error', (error) => {
       response.send(error);
     });
+
     req.end();
   });
 });

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ChatService, Message } from '../../chat.service';
+import { ChatService, Message, Prompt } from '../../chat.service';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/scan';
 
@@ -13,6 +13,7 @@ export class ChatDialogComponent implements OnInit {
 
   messages: Observable<Message[]>;
   formValue: string;
+  currentPrompt: Prompt;
 
   constructor(public chat: ChatService) { }
 
@@ -20,6 +21,12 @@ export class ChatDialogComponent implements OnInit {
     // appends to array after each new message is added to the feed
     this.messages = this.chat.conversation.asObservable()
       .scan((accumulated, current) => accumulated.concat(current));
+
+    this.currentPrompt = this.chat.prompts
+    // this.currentPrompt = this.chat.prompts.asObservable()
+      // .scan((accumulated, current) => accumulated.concat(current));
+
+    console.log(this.currentPrompt)
   }
 
   sendMessage() {
@@ -27,4 +34,8 @@ export class ChatDialogComponent implements OnInit {
     this.formValue = '';
   }
 
+  selectOption() {
+    this.chat.sendSelection(this.formValue);
+    // this.currentPrompt.release();
+  }
 }

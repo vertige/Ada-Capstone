@@ -22,7 +22,7 @@ exports.dialogflowProxy = functions.https.onRequest((request, response) => {
     ravelryFindPattern: (res) => {
       const patternName = res.result.parameters['pattern-title'];
       responseObject.action = 'listPatterns';
-      responseObject.speech =  `These are the top Ravelry search results for ${patternName}`;
+      responseObject.speech = `These are the top Ravelry search results for ${patternName}`;
       return http.get('https://api.ravelry.com/patterns/search.json', {
         auth: {
           username: functions.config().ravelry.username,

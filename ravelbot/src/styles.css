@@ -16,7 +16,14 @@
     color: #363636;
     margin-right: 100px;
 }
+.message.selection {
+  background-color: #2F2F2F;
+  color: #fff;
+  margin-left: 100px;
+  text-align: right;
+}
 .message.to + .message.to,
-.message.from + .message.from {
+.message.from + .message.from,
+.message.selection + .message.selection {
 margin-top: -10px;
 }

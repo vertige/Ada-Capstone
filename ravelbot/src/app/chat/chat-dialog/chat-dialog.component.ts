@@ -22,11 +22,8 @@ export class ChatDialogComponent implements OnInit {
     this.messages = this.chat.conversation.asObservable()
       .scan((accumulated, current) => accumulated.concat(current));
 
+    // if there is a list of ptions, it will show prompts
     this.currentPrompt = this.chat.prompts
-    // this.currentPrompt = this.chat.prompts.asObservable()
-      // .scan((accumulated, current) => accumulated.concat(current));
-
-    console.log(this.currentPrompt)
   }
 
   sendMessage() {
@@ -35,7 +32,8 @@ export class ChatDialogComponent implements OnInit {
   }
 
   selectOption() {
+    this.chat.postOptions(this.currentPrompt.content);
     this.chat.sendSelection(this.formValue);
-    // this.currentPrompt.release();
+    this.formValue = '';
   }
 }

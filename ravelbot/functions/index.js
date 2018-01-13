@@ -22,7 +22,7 @@ exports.dialogflowProxy = functions.https.onRequest((request, response) => {
     ravelryFindPattern: (res) => {
       const patternName = res.result.parameters['pattern-title'];
       responseObject.action = 'listPatterns';
-      responseObject.speech = `These are the top Ravelry search results for ${patternName}`;
+      responseObject.speech = `I searched Ravelry for: ${patternName} and found the following (please make a selection):`;
       return http.get('https://api.ravelry.com/patterns/search.json', {
         auth: {
           username: functions.config().ravelry.username,
@@ -47,7 +47,7 @@ exports.dialogflowProxy = functions.https.onRequest((request, response) => {
         });
     },
     default: (res) => {
-      responseObject.speech = res.result.fulfillment.speech
+      responseObject.speech = res.result.fulfillment.speech;
       return Promise.resolve(responseObject);
     },
   };
@@ -57,6 +57,58 @@ exports.dialogflowProxy = functions.https.onRequest((request, response) => {
     const { query: { message } } = request;
     const { query: { sessionId } } = request;
     const req = dialogflowClient(dialogflowKey).textRequest(message, { sessionId });
+
+    req.on('response', (res) => {
+      // An action is a string used to identify what needs to be done in fulfillment
+      let { result: { action } } = res; // let action = res.result.action
+
+      if (!actionHandlers[action]) {
+        action = 'default';
+      }
+
+      actionHandlers[action](res).then(val => response.send(val));
+    });
+
+    req.on('error', (error) => {
+      response.send(error);
+    });
+
+    req.end();
+  });
+});
+
+// Make CORS proxy for sendSelection Post
+exports.dialogflowPost = functions.https.onRequest((request, response) => {
+  const responseObject = {
+    action: 'default',
+    speech: '',
+    attachments: [],
+  };
+
+  const actionHandlers = {
+    default: (res) => {
+      responseObject.speech = res.result.fulfillment.speech;
+      return Promise.resolve(responseObject);
+    },
+  };
+
+  cors(request, response, () => {
+    const dialogflowPostKey = functions.config().dialogflow.postkey;
+    const { query: { event } } = request;
+    const { query: { sessionId } } = request;
+
+    const { params } = request;
+
+    // const req = dialogflowClient(dialogflowPostKey).eventRequest(event, { sessionId });
+
+    const req = http.post('https://api.dialogflow.com/api/query?v=20150910', {
+      auth: {
+        bearer: dialogflowPostKey,
+      },
+      params: {
+        params,
+      },
+    });
 
     req.on('response', (res) => {
       // An action is a string used to identify what needs to be done in fulfillment

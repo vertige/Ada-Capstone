@@ -12,7 +12,7 @@
 
 <ng-container *ngIf="currentPrompt.content.length > 0">
 
-  <label for="nameField">Your Options ()</label>
+  <label for="nameField">Select One </label>
   <ng-container *ngFor="let option of currentPrompt.content">
     <button (click)="formValue=option; selectOption()">{{ option.title }} by {{option.designer}}</button>
   </ng-container>

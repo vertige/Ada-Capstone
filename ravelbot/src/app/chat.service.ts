@@ -19,12 +19,9 @@ export class Prompt {
 export class ChatService {
 
   conversation = new BehaviorSubject<Message[]>([]);
-  // prompts = new BehaviorSubject<Prompt[]>([]);
   prompts = new Prompt([]);
 
   readonly DIALOGFLOW_URL = 'https://us-central1-ravelbot.cloudfunctions.net/dialogflowProxy/';
-
-  // readonly DIALOGFLOW_POST_URL = 'https://us-central1-ravelbot.cloudfunctions.net/dialogflowPost';
 
   readonly DIALOGFLOW_POST_URL = 'https://api.dialogflow.com/v1/query'
 
@@ -65,39 +62,43 @@ export class ChatService {
     for (let option of options) {
       text = `${text}-${option.title} by ${option.designer}\n`
     }
-    this.postSelector(text);
+    this.postSelected(text);
   };
 
   // Sends DialogFlow selection
   sendSelection(choice) {
-    const userSelection = new Message(`You Selected: ${choice.title} by ${choice.designer}`, 'selector');
-    this.update(userSelection);
+    console.log(choice);
+    this.postSelected(`You Selected: ${choice.title} by ${choice.designer}`);
 
-    // TODO: Tell Dialogflow there's been a selection.  Call Ravelry for specific pattern
-    // let event = `{'name': 'test_event', 'data': {'name': 'Joy!'}}`;
-    // let params = new HttpParams();
-    // // params = params.set('message', 'something');
-    // params = params.set('v', '20150910');
-    // params = params.set('e', event);
-    // params = params.set('sessionId', this.session());
-    // params = params.set('lang', 'en');
+    // TODO: Call Ravelry for specific pattern
 
-    const data = `{'event': {'name': 'test_event', 'data': {'name': 'Joy!'}}, 'timezone':'America/Los_Angeles', 'lang':'en', 'sessionId':'${this.session()}'}`
+    // Sets up Dialogflow for next step
+    const eventData = `{
+      'name': 'patternChosen',
+      'data': {'patternId': '${choice.id}'}
+    }`;
+    const language = 'en';
+    const timezone = 'America/Los_Angeles';
+    const data = `{
+      'event': ${eventData},
+      'timezone': '${timezone}',
+      'lang': '${language}',
+      'sessionId': '${this.session()}'
+    }`;
 
     let headers = new HttpHeaders().append('Content-type', 'application/json');
-    headers = headers.append('Authorization', 'Bearer 00e16cd8036d4f818851bec93ae63e2d');
+    headers = headers.append('Authorization', 'Bearer 00e16cd8036d4f818851bec93ae63e2d'); // Read-only key
 
     this.http.post(this.DIALOGFLOW_POST_URL, data, { headers: headers, responseType: 'text' })
       .subscribe((responseObject) => {
-        console.log(responseObject);
         const parsedResponse = JSON.parse(responseObject);
 
         // Update Bots speech
-        let replyText = JSON.parse(responseObject).speech;
+        let replyText = JSON.parse(responseObject).result.speech;
         this.postBot(replyText);
       });
 
-    // return this.http.get(this.DIALOGFLOW_URL, { params,  responseType: 'text' });
+    // Clears the prompts
     this.prompts.clear();
   };
 
@@ -116,9 +117,14 @@ export class ChatService {
     this.update(botMessage);
   };
 
-  postSelector(output: string) {
-    const message = new Message(output, 'selector');
-    this.update(message);
+  postUser(output: string) {
+    const userMessage = new Message(output, 'user');
+    this.update(userMessage);
+  };
+
+  postSelected(details: string) {
+    const selection = new Message(details, 'selected');
+    this.update(selection);
   };
 
   // Adds message to source

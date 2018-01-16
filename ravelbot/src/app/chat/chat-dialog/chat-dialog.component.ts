@@ -18,11 +18,14 @@ export class ChatDialogComponent implements OnInit {
   constructor(public chat: ChatService) { }
 
   ngOnInit() {
+    // Initiates bot
+    this.chat.botWelcome();
+
     // appends to array after each new message is added to the feed
     this.messages = this.chat.conversation.asObservable()
       .scan((accumulated, current) => accumulated.concat(current));
 
-    // if there is a list of ptions, it will show prompts
+    // if there is a list of options, it will show prompts
     this.currentPrompt = this.chat.prompts
   }
 

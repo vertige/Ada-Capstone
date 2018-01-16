@@ -5,7 +5,6 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/map';
 import { v4 as uuid } from 'uuid';
 
-// Message class for displaying messages in the component
 export class Message {
   constructor(public content: string, public sentBy: string) {}
 };
@@ -27,10 +26,16 @@ export class ChatService {
 
   constructor(private http: HttpClient) { };
 
+  // Initiates Ravelbot to welcome message
+  botWelcome() {
+    const eventData = `{ 'name': 'welcome' }`;
+
+    this.triggerBotEvent(eventData);
+  };
+
   // Sends and receives messages via DialogFlow
   converse(msg: string) {
-    const userMessage = new Message(msg, 'user');
-    this.update(userMessage);
+    this.postMessage(msg, 'user')
 
     this.getResponse(msg).subscribe((responseObject) => {
       const parsedResponse = JSON.parse(responseObject);
@@ -40,9 +45,8 @@ export class ChatService {
         this.prompts.content = parsedResponse.attachments;
       }
 
-      // Update Bots speech
       let replyText = JSON.parse(responseObject).speech;
-      this.postBot(replyText);
+      this.postMessage(replyText, 'bot');
     });
   };
 
@@ -60,23 +64,13 @@ export class ChatService {
   postOptions(options) {
     let text = 'Your options were: \n'
     for (let option of options) {
-      text = `${text}-${option.title} by ${option.designer}\n`
+      text = `${text}\n- ${option.title} by ${option.designer}\n`
     }
-    this.postSelected(text);
+    this.postMessage(text, 'selected');
   };
 
-  // Sends DialogFlow selection
-  sendSelection(choice) {
-    console.log(choice);
-    this.postSelected(`You Selected: ${choice.title} by ${choice.designer}`);
-
-    // TODO: Call Ravelry for specific pattern
-
-    // Sets up Dialogflow for next step
-    const eventData = `{
-      'name': 'patternChosen',
-      'data': {'patternId': '${choice.id}'}
-    }`;
+  // Triggers a specific Bot event
+  triggerBotEvent(eventData) {
     const language = 'en';
     const timezone = 'America/Los_Angeles';
     const data = `{
@@ -90,13 +84,26 @@ export class ChatService {
     headers = headers.append('Authorization', 'Bearer 00e16cd8036d4f818851bec93ae63e2d'); // Read-only key
 
     this.http.post(this.DIALOGFLOW_POST_URL, data, { headers: headers, responseType: 'text' })
-      .subscribe((responseObject) => {
-        const parsedResponse = JSON.parse(responseObject);
+    .subscribe((responseObject) => {
+      const parsedResponse = JSON.parse(responseObject);
 
-        // Update Bots speech
-        let replyText = JSON.parse(responseObject).result.speech;
-        this.postBot(replyText);
-      });
+      // Update Bots speech
+      let replyText = JSON.parse(responseObject).result.speech;
+      this.postMessage(replyText, 'bot');
+    });
+  };
+
+  // Sends DialogFlow selection
+  sendSelection(choice) {
+    console.log(choice);
+    this.postMessage(`You Selected: ${choice.title} by ${choice.designer}`, 'bot');
+
+    // TODO: Call Ravelry for specific pattern
+
+    // Sets up Dialogflow for next step
+    const eventData = `{ 'name': 'patternName', 'data': {'patternId': '${choice.id}'}}`;
+
+    this.triggerBotEvent(eventData);
 
     // Clears the prompts
     this.prompts.clear();
@@ -112,24 +119,10 @@ export class ChatService {
     return sessionId;
   };
 
-  postBot(output: string) {
-    const botMessage = new Message(output, 'bot');
-    this.update(botMessage);
-  };
-
-  postUser(output: string) {
-    const userMessage = new Message(output, 'user');
-    this.update(userMessage);
-  };
-
-  postSelected(details: string) {
-    const selection = new Message(details, 'selected');
-    this.update(selection);
-  };
-
-  // Adds message to source
-  update(msg: Message) {
-    this.conversation.next([msg]);
+  postMessage(output: string, user: string) {
+    const message = new Message(output, user);
+    // Adds message to source
+    this.conversation.next([message]);
   };
 
 };

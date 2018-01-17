@@ -6,7 +6,7 @@ import 'rxjs/add/operator/map';
 import { v4 as uuid } from 'uuid';
 
 export class Message {
-  constructor(public content: string, public sentBy: string) {}
+  constructor(public content: string, public sentBy: string, options: []) {}
 };
 
 export class Prompt {
@@ -29,7 +29,6 @@ export class ChatService {
   // Initiates Ravelbot to welcome message
   botWelcome() {
     const eventData = `{ 'name': 'welcome' }`;
-
     this.triggerBotEvent(eventData);
   };
 
@@ -39,7 +38,6 @@ export class ChatService {
 
     this.getResponse(msg).subscribe((responseObject) => {
       const parsedResponse = JSON.parse(responseObject);
-      console.log(parsedResponse);
       // Give attached options if available
       if (parsedResponse.attachments.length > 0) {
         this.prompts.content = parsedResponse.attachments;

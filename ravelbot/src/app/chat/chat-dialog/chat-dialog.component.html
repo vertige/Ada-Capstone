@@ -5,6 +5,7 @@
   <div class="message" [ngClass]="{ 'from': message.sentBy === 'bot',
                                     'to':   message.sentBy === 'user',
                                    'selection': message.sentBy === 'selected' }">
+
     {{ message.content }}
   </div>
 
@@ -12,12 +13,40 @@
 
 <ng-container *ngIf="currentPrompt.content.length > 0">
 
+  <!-- <label for="nameField">Select One </label> -->
+  <ng-container *ngFor="let option of currentPrompt.content">
+    <div class="message from">
+      <div class="row">
+
+        <div class="column column-25">
+          <img src={{option.imgURL}} />
+        </div>
+        <div class="column column-55">
+          <div class="row">
+            <h5>{{ option.title }}</h5>
+            <p>
+                 by {{option.designer}}
+            </p>
+          </div>
+          <div class="row">
+            <!-- <input class="button button-small" type="submit" value="Select" (click)="formValue=option; selectOption()"> -->
+            <button (click)="formValue=option; selectOption()" class="button button-clear">I'm the one!</button>
+          </div>
+        </div>
+      </div>
+  </div>
+  </ng-container>
+
+</ng-container>
+
+<!-- <ng-container *ngIf="currentPrompt.content.length > 0">
+
   <label for="nameField">Select One </label>
   <ng-container *ngFor="let option of currentPrompt.content">
     <button (click)="formValue=option; selectOption()">{{ option.title }} by {{option.designer}}</button>
   </ng-container>
 
-</ng-container>
+</ng-container> -->
 
 <ng-container *ngIf="currentPrompt.content.length == 0">
 

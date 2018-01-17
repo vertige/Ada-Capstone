@@ -38,7 +38,7 @@ exports.dialogflowProxy = functions.https.onRequest((request, response) => {
           for (const pattern of patternList) {
             responseObject.attachments.push({
               title: pattern.name,
-              imgURL: pattern.first_photo.small2_url,
+              imgURL: pattern.first_photo.small_url,
               id: pattern.id,
               designer: pattern.designer.name,
             });

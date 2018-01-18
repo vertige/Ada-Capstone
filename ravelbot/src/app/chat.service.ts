@@ -17,7 +17,7 @@ export class Prompt {
 export class ChatService {
 
   conversation = new BehaviorSubject<Message[]>([]);
-  prompts = new Array;
+  prompts = new BehaviorSubject<Prompt[]>([]);
 
   readonly DIALOGFLOW_URL = 'https://us-central1-ravelbot.cloudfunctions.net/dialogflowProxy/';
   readonly DIALOGFLOW_POST_URL = 'https://api.dialogflow.com/v1/query';
@@ -42,14 +42,16 @@ export class ChatService {
       this.postMessage(replyText, 'bot', options);
       console.log(parsedResponse);
 
-      // Clears the prompts
-      this.prompts.splice(0, this.prompts.length);
-
+      console.log(this.prompts);
       // Give alternate prompts
       if (parsedResponse.action == 'listPatterns') {
-        this.prompts.push(new Prompt('More', 'sendMessage')); //TODO: Give these actual functions in the component and service.
-        this.prompts.push(new Prompt('Search Again', 'sendMessage'));
-        this.prompts.push(new Prompt(`I'd like to ask something else`, 'sendMessage'));
+        const more = new Prompt('More', 'tempClear');
+        const searchAgain = new Prompt('Search Again', 'tempClear');
+        const somethingElse = new Prompt(`I'd like to ask something else`, 'tempClear');
+        this.prompts.next([more, searchAgain, somethingElse]);
+        // this.prompts.push(new Prompt('More', 'tempClear'));
+        // this.prompts.push(new Prompt('Search Again', 'tempClear'));
+        // this.prompts.push(new Prompt(`I'd like to ask something else`, 'tempClear'));
       }
     });
   };
@@ -109,11 +111,14 @@ export class ChatService {
       console.log(response);
     });
 
-    // Sets up Dialogflow for next step
-    const eventData = `{ 'name': 'patternName', 'data': {'patternId': '${choice.id}'}}`;
+    this.resetPrompts();
+    // // Sets up Dialogflow for next step
+    // const eventData = `{ 'name': 'patternName', 'data': {'patternId': '${choice.id}'}}`;
+    // this.triggerBotEvent(eventData);
+  };
 
-    this.triggerBotEvent(eventData);
-
+  resetPrompts() {
+    this.prompts.next([]);
   };
 
   // Gets session id

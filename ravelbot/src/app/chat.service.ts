@@ -6,19 +6,19 @@ import 'rxjs/add/operator/map';
 import { v4 as uuid } from 'uuid';
 
 export class Message {
-  constructor(public content: string, public sentBy: string, options: []) {}
+  constructor(public content: string, public sentBy: string, public options: Array<any> = []) {}
 };
 
-export class Prompt {
-  constructor(public content: Array<any>) {};
-  clear() { this.content.splice(0, this.content.length) };
-};
+// export class Prompt {
+//   constructor(public content: Array<any>) {};
+//   clear() { this.content.splice(0, this.content.length) };
+// };
 
 @Injectable()
 export class ChatService {
 
   conversation = new BehaviorSubject<Message[]>([]);
-  prompts = new Prompt([]);
+  // prompts = new Prompt([]);
 
   readonly DIALOGFLOW_URL = 'https://us-central1-ravelbot.cloudfunctions.net/dialogflowProxy/';
 
@@ -37,14 +37,15 @@ export class ChatService {
     this.postMessage(msg, 'user')
 
     this.getResponse(msg).subscribe((responseObject) => {
-      const parsedResponse = JSON.parse(responseObject);
-      // Give attached options if available
-      if (parsedResponse.attachments.length > 0) {
-        this.prompts.content = parsedResponse.attachments;
-      }
+      // const parsedResponse = JSON.parse(responseObject);
+      // // Give attached options if available
+      // if (parsedResponse.attachments.length > 0) {
+      //   this.prompts.content = parsedResponse.attachments;
+      // }
 
       let replyText = JSON.parse(responseObject).speech;
-      this.postMessage(replyText, 'bot');
+      let options = JSON.parse(responseObject).attachments
+      this.postMessage(replyText, 'bot', options);
     });
   };
 
@@ -83,7 +84,7 @@ export class ChatService {
 
     this.http.post(this.DIALOGFLOW_POST_URL, data, { headers: headers, responseType: 'text' })
     .subscribe((responseObject) => {
-      const parsedResponse = JSON.parse(responseObject);
+      // const parsedResponse = JSON.parse(responseObject);
 
       // Update Bots speech
       let replyText = JSON.parse(responseObject).result.speech;
@@ -104,7 +105,7 @@ export class ChatService {
     this.triggerBotEvent(eventData);
 
     // Clears the prompts
-    this.prompts.clear();
+    // this.prompts.clear();
   };
 
   // Gets session id
@@ -117,8 +118,8 @@ export class ChatService {
     return sessionId;
   };
 
-  postMessage(output: string, user: string) {
-    const message = new Message(output, user);
+  postMessage(output: string, user: string, options?: Array<any>) {
+    const message = new Message(output, user, options);
     // Adds message to source
     this.conversation.next([message]);
   };

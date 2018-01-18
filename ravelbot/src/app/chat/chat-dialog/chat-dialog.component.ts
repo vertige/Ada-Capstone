@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ChatService, Message, Prompt } from '../../chat.service';
+import { ChatService, Message } from '../../chat.service';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/scan';
 
@@ -13,7 +13,7 @@ export class ChatDialogComponent implements OnInit {
 
   messages: Observable<Message[]>;
   formValue: string;
-  currentPrompt: Prompt;
+  // currentPrompt: Prompt;
 
   constructor(public chat: ChatService) { }
 
@@ -26,7 +26,7 @@ export class ChatDialogComponent implements OnInit {
       .scan((accumulated, current) => accumulated.concat(current));
 
     // if there is a list of options, it will show prompts
-    this.currentPrompt = this.chat.prompts
+    // this.currentPrompt = this.chat.prompts
   }
 
   sendMessage() {
@@ -35,7 +35,7 @@ export class ChatDialogComponent implements OnInit {
   }
 
   selectOption() {
-    this.chat.postOptions(this.currentPrompt.content);
+    // this.chat.postOptions(this.messages.options);
     this.chat.sendSelection(this.formValue);
     this.formValue = '';
   }

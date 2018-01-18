@@ -5,38 +5,28 @@
   <div class="message" [ngClass]="{ 'from': message.sentBy === 'bot',
   'to':   message.sentBy === 'user',
   'selection': message.sentBy === 'selected' }">
-
-  {{ message.content }}
-</div>
-
-</ng-container>
-
-<ng-container *ngIf="currentPrompt.content.length > 0">
-
-  <!-- <label for="nameField">Select One </label> -->
-  <div class="message from">
-    <table>
-      <ng-container *ngFor="let option of currentPrompt.content">
-        <tr (click)="formValue=option; selectOption()">
-          <td>
-            <img src={{option.imgURL}} />
-          </td>
-          <td>
-            <h5>{{ option.title }}</h5> by {{option.designer}}
-          </td>
-        </tr>
-      </ng-container>
-    </table>
+    {{ message.content }}
   </div>
-</ng-container>
 
+  <ng-container *ngIf="message.options?.length > 0">
 
-<ng-container *ngIf="currentPrompt.content.length == 0">
+    <div class="message from">
+      <table>
+        <ng-container *ngFor="let option of message.options">
+          <tr (click)="formValue=option; selectOption()">
+            <td>
+              <img src={{option.imgURL}} />
+            </td>
+            <td>
+              <h5><a>{{ option.title }}</a></h5> by {{option.designer}}
+            </td>
+          </tr>
+        </ng-container>
+      </table>
+    </div>
+  </ng-container> <!-- end of options loop -->
+</ng-container> <!-- end of message of messages loop -->
 
-  <label for="nameField">Your Message</label>
-
-  <input [(ngModel)]="formValue" (keyup.enter)="sendMessage()" type="text">
-
-  <button (click)="sendMessage()">Send</button>
-
-</ng-container>
+    <label for="nameField">Your Message</label>
+    <input [(ngModel)]="formValue" (keyup.enter)="sendMessage()" type="text">
+    <button (click)="sendMessage()">Send</button>

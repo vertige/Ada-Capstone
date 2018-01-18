@@ -19,7 +19,9 @@
 }
 
 .message.from table img{
-  text-align: center;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .message.from table h5 {

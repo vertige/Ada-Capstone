@@ -9,20 +9,19 @@ export class Message {
   constructor(public content: string, public sentBy: string, public options: Array<any> = []) {}
 };
 
-// export class Prompt {
-//   constructor(public content: Array<any>) {};
-//   clear() { this.content.splice(0, this.content.length) };
-// };
+export class Prompt {
+  constructor(public text: string, public action: string) {};
+};
 
 @Injectable()
 export class ChatService {
 
   conversation = new BehaviorSubject<Message[]>([]);
-  // prompts = new Prompt([]);
+  prompts = new Array;
 
   readonly DIALOGFLOW_URL = 'https://us-central1-ravelbot.cloudfunctions.net/dialogflowProxy/';
-
-  readonly DIALOGFLOW_POST_URL = 'https://api.dialogflow.com/v1/query'
+  readonly DIALOGFLOW_POST_URL = 'https://api.dialogflow.com/v1/query';
+  readonly RAVELRY_URL = 'https://us-central1-ravelbot.cloudfunctions.net/ravelryProxy/';
 
   constructor(private http: HttpClient) { };
 
@@ -37,15 +36,21 @@ export class ChatService {
     this.postMessage(msg, 'user')
 
     this.getResponse(msg).subscribe((responseObject) => {
-      // const parsedResponse = JSON.parse(responseObject);
-      // // Give attached options if available
-      // if (parsedResponse.attachments.length > 0) {
-      //   this.prompts.content = parsedResponse.attachments;
-      // }
-
-      let replyText = JSON.parse(responseObject).speech;
-      let options = JSON.parse(responseObject).attachments
+      const parsedResponse = JSON.parse(responseObject)
+      let replyText = parsedResponse.speech;
+      let options = parsedResponse.attachments
       this.postMessage(replyText, 'bot', options);
+      console.log(parsedResponse);
+
+      // Clears the prompts
+      this.prompts.splice(0, this.prompts.length);
+
+      // Give alternate prompts
+      if (parsedResponse.action == 'listPatterns') {
+        this.prompts.push(new Prompt('More', 'sendMessage')); //TODO: Give these actual functions in the component and service.
+        this.prompts.push(new Prompt('Search Again', 'sendMessage'));
+        this.prompts.push(new Prompt(`I'd like to ask something else`, 'sendMessage'));
+      }
     });
   };
 
@@ -59,14 +64,14 @@ export class ChatService {
     return this.http.get(this.DIALOGFLOW_URL, { params,  responseType: 'text' });
   };
 
-  // Sends a list of previous postOptions
-  postOptions(options) {
-    let text = 'Your options were: \n'
-    for (let option of options) {
-      text = `${text}\n- ${option.title} by ${option.designer}\n`
-    }
-    this.postMessage(text, 'selected');
-  };
+  // Sends a list of previous postOptions NOTE: This can be deleted most likely.
+  // postOptions(options) {
+  //   let text = 'Your options were: \n'
+  //   for (let option of options) {
+  //     text = `${text}\n- ${option.title} by ${option.designer}\n`
+  //   }
+  //   this.postMessage(text, 'selected');
+  // };
 
   // Triggers a specific Bot event
   triggerBotEvent(eventData) {
@@ -95,17 +100,20 @@ export class ChatService {
   // Sends DialogFlow selection
   sendSelection(choice) {
     console.log(choice);
-    this.postMessage(`You Selected: ${choice.title} by ${choice.designer}`, 'bot');
+    this.postMessage(`Your Selected: ${choice.title} by ${choice.designer}`, 'selected');
 
-    // TODO: Call Ravelry for specific pattern
+    // Gets specific pattern info response from ravelryProxy
+    let params = new HttpParams();
+    params = params.set('patternId', choice.id);
+    this.http.get(this.RAVELRY_URL, { params }).subscribe((response) => {
+      console.log(response);
+    });
 
     // Sets up Dialogflow for next step
     const eventData = `{ 'name': 'patternName', 'data': {'patternId': '${choice.id}'}}`;
 
     this.triggerBotEvent(eventData);
 
-    // Clears the prompts
-    // this.prompts.clear();
   };
 
   // Gets session id

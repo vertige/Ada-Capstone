@@ -1,5 +1,5 @@
 .message {
-    border-radius: 50px;
+    border-radius: 35px;
     margin: 0 15px 10px;
     padding: 15px 20px;
     position: relative;
@@ -31,7 +31,8 @@
 .message.selection {
   background-color: #3F3F3F;
   color: #fff;
-  margin-right: 10%;
+  margin-left: 10%;
+  text-align: right;
 }
 .message.to + .message.to,
 .message.from + .message.from,
@@ -40,6 +41,7 @@ margin-top: -10px;
 }
 
 img {
+  border-radius: 5%;
   max-width: 10rem;
   max-height: 15rem;
 }

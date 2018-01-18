@@ -39,7 +39,7 @@ exports.dialogflowProxy = functions.https.onRequest((request, response) => {
             responseObject.attachments.push({
               title: pattern.name,
               imgURL: pattern.first_photo.small_url,
-              id: pattern.id,
+              id: `${pattern.id}`,
               designer: pattern.designer.name,
             });
           }
@@ -74,5 +74,17 @@ exports.dialogflowProxy = functions.https.onRequest((request, response) => {
     });
 
     req.end();
+  });
+});
+
+exports.ravelryProxy = functions.https.onRequest((request, response) => {
+  cors(request, response, () => {
+    const { query: { patternId } } = request;
+    Promise.resolve(http.get(`https://api.ravelry.com/patterns/${patternId}.json`, {
+      auth: {
+        username: functions.config().ravelry.username,
+        password: functions.config().ravelry.password,
+      },
+    })).then(val => response.send(val.body));
   });
 });

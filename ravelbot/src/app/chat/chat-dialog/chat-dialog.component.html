@@ -27,6 +27,14 @@
   </ng-container> <!-- end of options loop -->
 </ng-container> <!-- end of message of messages loop -->
 
-    <label for="nameField">Your Message</label>
-    <input [(ngModel)]="formValue" (keyup.enter)="sendMessage()" type="text">
-    <button (click)="sendMessage()">Send</button>
+<ng-container *ngIf="this.currentPrompts.length == 0">
+  <label for="nameField">Your Message</label>
+  <input [(ngModel)]="formValue" (keyup.enter)="sendMessage()" type="text">
+  <button (click)="sendMessage()">Send</button>
+</ng-container>
+
+<ng-container *ngIf="this.currentPrompts.length > 0">
+  <ng-container *ngFor="let prompt of currentPrompts">
+  <button (click)="this[prompt.action]()">{{prompt.text}}</button>
+  </ng-container>
+</ng-container>

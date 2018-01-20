@@ -96,8 +96,9 @@ export class ChatService {
     let params = new HttpParams();
     params = params.set('patternId', choice.id);
 
-    this.http.get(this.RAVELRY_URL, { params }).subscribe((response) => {
-      let pattern = response.pattern;
+    this.http.get(this.RAVELRY_URL, { params, responseType: 'text' }).subscribe((response) => {
+      let pattern = JSON.parse(response).pattern;
+      // console.log(response);
       let details = {
         title: choice.title,
         designer:choice.designer,

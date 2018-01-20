@@ -27,7 +27,6 @@ export class ChatDialogComponent implements OnInit {
 
     // if there is a list of options, it will show prompts
     this.currentPrompts = this.chat.prompts.asObservable();
-    console.log(this.currentPrompts.length);
   }
 
   sendMessage() {

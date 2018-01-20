@@ -1,15 +1,13 @@
 <h1>RavelBot</h1>
-
+<section id="chat-messages">
 <ng-container *ngFor="let message of messages | async">
-
   <div class="message" [ngClass]="{ 'from': message.sentBy === 'bot',
   'to':   message.sentBy === 'user',
   'selection': message.sentBy === 'selected' }">
     {{ message.content }}
   </div>
 
-  <ng-container *ngIf="message.options?.length > 0">
-
+  <ng-container *ngIf="message.action === 'listPatterns'">
     <div class="message from">
       <table>
         <ng-container *ngFor="let option of message.options">
@@ -21,20 +19,50 @@
               <h5><a>{{ option.title }}</a></h5> by {{option.designer}}
             </td>
           </tr>
-        </ng-container>
+        </ng-container> <!-- end of options loop -->
       </table>
     </div>
-  </ng-container> <!-- end of options loop -->
+  </ng-container> <!-- end of listPatterns -->
+
+  <ng-container *ngIf="message.action === 'showPattern'">
+    <div class="message from">
+      <h5>{{ message.options[0].title}}</h5>
+      <p>
+        by {{ message.options[0].designer }}
+      </p>
+      <img src={{message.options[0].imgURL}} />
+      <h6>Yardage</h6>
+      <p>
+        {{ message.options[0].yardage }}
+      </p>
+      <h6>Suggested Yarn(s)</h6>
+      <ul>
+        <ng-container *ngFor="let yarn of message.options[0].yarns">
+          <li>{{ yarn }}</li>
+        </ng-container>
+        <li>
+          or generally {{ message.options[0].yarnWeight }} weight yarn
+        </li>
+      </ul>
+      <h6>Gauge</h6>
+      <p>
+        {{ message.options[0].gaugeNotes }}
+      </p>
+    </div>
+  </ng-container> <!-- end of listPatterns -->
 </ng-container> <!-- end of message of messages loop -->
+</section>
 
-<ng-container *ngIf="(this.currentPrompts | async).length == 0">
-  <label for="nameField">Your Message</label>
-  <input [(ngModel)]="formValue" (keyup.enter)="sendMessage()" type="text">
-  <button (click)="sendMessage()">Send</button>
-</ng-container>
-
-<ng-container *ngIf="(this.currentPrompts | async).length > 0">
-  <ng-container *ngFor="let prompt of (currentPrompts | async)">
-  <button (click)="this[prompt.action]()">{{prompt.text}}</button>
+<section id="user-input">
+  <ng-container *ngIf="(this.currentPrompts | async).length == 0">
+    <label for="nameField">Your Message</label>
+    <input [(ngModel)]="formValue" (keyup.enter)="sendMessage()" type="text">
+    <button (click)="sendMessage()">Send</button>
   </ng-container>
-</ng-container>
+
+  <ng-container *ngIf="(this.currentPrompts | async).length > 0">
+    <ng-container *ngFor="let prompt of (currentPrompts | async)">
+      <button (click)="this[prompt.action]()">{{prompt.text}}</button>
+    </ng-container>
+  </ng-container>
+</section>

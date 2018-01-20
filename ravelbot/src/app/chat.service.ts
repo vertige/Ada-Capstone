@@ -6,7 +6,7 @@ import 'rxjs/add/operator/map';
 import { v4 as uuid } from 'uuid';
 
 export class Message {
-  constructor(public content: string, public sentBy: string, public options: Array<any> = []) {}
+  constructor(public content: string, public sentBy: string, public action?: string, public options?: Array<any>) {}
 };
 
 export class Prompt {
@@ -38,20 +38,17 @@ export class ChatService {
     this.getResponse(msg).subscribe((responseObject) => {
       const parsedResponse = JSON.parse(responseObject)
       let replyText = parsedResponse.speech;
-      let options = parsedResponse.attachments
-      this.postMessage(replyText, 'bot', options);
+      let action = parsedResponse.action;
+      let options = parsedResponse.attachments;
+      this.postMessage(replyText, 'bot', action, options);
       console.log(parsedResponse);
 
-      console.log(this.prompts);
       // Give alternate prompts
-      if (parsedResponse.action == 'listPatterns') {
+      if (action == 'listPatterns') {
         const more = new Prompt('More', 'tempClear');
         const searchAgain = new Prompt('Search Again', 'tempClear');
         const somethingElse = new Prompt(`I'd like to ask something else`, 'tempClear');
         this.prompts.next([more, searchAgain, somethingElse]);
-        // this.prompts.push(new Prompt('More', 'tempClear'));
-        // this.prompts.push(new Prompt('Search Again', 'tempClear'));
-        // this.prompts.push(new Prompt(`I'd like to ask something else`, 'tempClear'));
       }
     });
   };
@@ -65,15 +62,6 @@ export class ChatService {
 
     return this.http.get(this.DIALOGFLOW_URL, { params,  responseType: 'text' });
   };
-
-  // Sends a list of previous postOptions NOTE: This can be deleted most likely.
-  // postOptions(options) {
-  //   let text = 'Your options were: \n'
-  //   for (let option of options) {
-  //     text = `${text}\n- ${option.title} by ${option.designer}\n`
-  //   }
-  //   this.postMessage(text, 'selected');
-  // };
 
   // Triggers a specific Bot event
   triggerBotEvent(eventData) {
@@ -101,17 +89,34 @@ export class ChatService {
 
   // Sends DialogFlow selection
   sendSelection(choice) {
-    console.log(choice);
     this.postMessage(`Your Selected: ${choice.title} by ${choice.designer}`, 'selected');
 
     // Gets specific pattern info response from ravelryProxy
+    // let details;
     let params = new HttpParams();
     params = params.set('patternId', choice.id);
-    this.http.get(this.RAVELRY_URL, { params }).subscribe((response) => {
-      console.log(response);
-    });
 
+    this.http.get(this.RAVELRY_URL, { params }).subscribe((response) => {
+      let pattern = response.pattern;
+      let details = {
+        title: choice.title,
+        designer:choice.designer,
+        imgURL: choice.imgURL,
+        // id:choice.id,
+        // gauge: pattern.gauge,
+        gaugeNotes: pattern.gauge_description,
+        // notes: pattern.notes_html,
+        yarns: [],
+        yardage: pattern.yardage_description,
+        yarnWeight: pattern.yarn_weight_description,
+      };
+      for (let pack of pattern.packs) {
+        details.yarns.push(pack.yarn_name);
+      }
+      this.postMessage('Here are the details of your selected pattern:', 'bot', 'showPattern', [details]);
+    });
     this.resetPrompts();
+
     // // Sets up Dialogflow for next step
     // const eventData = `{ 'name': 'patternName', 'data': {'patternId': '${choice.id}'}}`;
     // this.triggerBotEvent(eventData);
@@ -131,8 +136,8 @@ export class ChatService {
     return sessionId;
   };
 
-  postMessage(output: string, user: string, options?: Array<any>) {
-    const message = new Message(output, user, options);
+  postMessage(output: string, user: string, action?: string, options?: Array<any>) {
+    const message = new Message(output, user, action, options);
     // Adds message to source
     this.conversation.next([message]);
   };

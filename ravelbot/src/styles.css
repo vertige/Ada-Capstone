@@ -54,7 +54,7 @@ html, body {
 #wrapper {
   /* display: flex; */
   /* align-items: stretch; */
-  max-height: 100%;
+  max-height: 100vh;
   /* flex-direction: column; */
 }
 
@@ -66,12 +66,12 @@ html, body {
   width: 100%;
 }
 
-#chat-messages {
+#chatMessages {
   position: relative;
-  padding-top: 50px;
+  padding-top: 55px;
   padding-bottom: 250px;
   /* flex: 1; */
-  height: calc(100% - 300px);
+  height: calc(100vh);
   /* border: 1px solid orange; */
   overflow-y: auto;
 }
@@ -80,8 +80,10 @@ html, body {
   position: fixed;
   bottom: 0;
   width: 100%;
+  margin-left: auto;
+  margin-right: auto;
   max-height: 250px;
-  padding-top: 10px;
+  padding: 10px 10px 0 10px;
   background-color: white;
   /* background: lightblue; */
   align-content: top;

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../chat.service';
-import { ChatDialogComponent } from './chat-dialog/chat-dialog.component';
+import { ScrollToDirective, ChatDialogComponent } from './chat-dialog/chat-dialog.component';
 
 import { HttpClientModule } from '@angular/common/http';
 
@@ -13,8 +13,8 @@ import { HttpClientModule } from '@angular/common/http';
     FormsModule,
     HttpClientModule
   ],
-  declarations: [ ChatDialogComponent ],
-  exports: [ ChatDialogComponent ],
+  declarations: [ ScrollToDirective, ChatDialogComponent ],
+  exports: [ ScrollToDirective, ChatDialogComponent ],
   providers: [ ChatService ]
 })
 export class ChatModule { }

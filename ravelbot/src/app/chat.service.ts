@@ -43,15 +43,19 @@ export class ChatService {
       let replyText = parsedResponse.speech;
       let action = parsedResponse.action;
       let options = parsedResponse.attachments;
+      if (action == 'listPatterns' && parsedResponse.attachments.length == 0) { //no results found
+        this.postMessage(`I'm sorry, there were no results for "${parsedResponse.entity}"`, 'bot');
+      } else {
       this.postMessage(replyText, 'bot', action, options);
       console.log(parsedResponse);
 
-      // Give alternate prompts
-      if (action == 'listPatterns') {
-        const more = new Prompt('More', 'tempClear');
-        const searchAgain = new Prompt('Search Again', 'tempClear');
-        const somethingElse = new Prompt(`I'd like to ask something else`, 'tempClear');
-        this.prompts.next([more, searchAgain, somethingElse]);
+        // Give alternate prompts
+        if (action == 'listPatterns') {
+          // const more = new Prompt('More', 'tempClear');
+          const searchAgain = new Prompt('Search Again', 'searchAgain');
+          const somethingElse = new Prompt(`I'd like to ask something else`, 'resetChat');
+          this.prompts.next([searchAgain, somethingElse]);
+        }
       }
     });
   };
@@ -92,7 +96,7 @@ export class ChatService {
 
   // Sends DialogFlow selection
   sendSelection(choice) {
-    this.postMessage(`Your Selected: ${choice.title} by ${choice.designer}`, 'selected');
+    this.postMessage(`Your Selection: ${choice.title} by ${choice.designer}`, 'selected');
 
     // Gets specific pattern info response from ravelryProxy
     let params = new HttpParams();
@@ -123,8 +127,8 @@ export class ChatService {
       return options
 
     }).then((options) => {
-      options.push(new Prompt('Search Again', 'tempClear'));
-      options.push(new Prompt(`I'd like to ask something else`, 'tempClear'));
+      options.push(new Prompt('Search Again', 'searchAgain'));
+      options.push(new Prompt(`I'd like to ask something else`, 'resetChat'));
       this.prompts.next(options);
     });
 

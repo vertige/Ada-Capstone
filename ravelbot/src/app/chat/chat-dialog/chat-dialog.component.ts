@@ -1,14 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Directive, AfterViewInit, ElementRef } from '@angular/core';
 import { ChatService, Message, Prompt } from '../../chat.service';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/scan';
+
+
+@Directive({
+  selector: '[scrollTo]',
+})
+export class ScrollToDirective implements AfterViewInit {
+  constructor(private elRef: ElementRef) {}
+  ngAfterViewInit() {
+    this.elRef.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
 
 @Component({
   selector: 'chat-dialog',
   templateUrl: './chat-dialog.component.html',
   styleUrls: ['./chat-dialog.component.css'],
+  // directives: [ ScrollToDirective ]
 })
-
 export class ChatDialogComponent implements OnInit {
 
   messages: Observable<Message[]>;
@@ -37,6 +48,18 @@ export class ChatDialogComponent implements OnInit {
   selectOption() {
     this.chat.sendSelection(this.formValue);
     this.formValue = '';
+  }
+
+  searchAgain() {
+    this.chat.resetPrompts();
+    const eventData = `{ 'name': 'searchAgain' }`;
+    this.chat.triggerBotEvent(eventData);
+  }
+
+  resetChat() {
+    this.chat.resetPrompts();
+    const eventData = `{ 'name': 'chitChat' }`;
+    this.chat.triggerBotEvent(eventData);
   }
 
   tempClear() {

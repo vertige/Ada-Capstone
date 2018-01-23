@@ -1,12 +1,15 @@
 <div id="wrapper">
 <h1 id="header">RavelBot</h1>
-<section id="chat-messages">
-<ng-container *ngFor="let message of messages | async">
-  <div class="message" [ngClass]="{ 'from': message.sentBy === 'bot',
+<section id="chatMessages" >
+<ng-container id="messages" *ngFor="let message of messages | async">
+  <div scrollTo class="message" [ngClass]="{ 'from': message.sentBy === 'bot',
   'to':   message.sentBy === 'user',
   'selection': message.sentBy === 'selected' }">
     {{ message.content }}
   </div>
+  <!-- <div scrollTo>
+
+  </div> -->
 
   <ng-container *ngIf="message.action === 'listPatterns'">
     <div class="message from">
@@ -41,9 +44,7 @@
         <ng-container *ngFor="let yarn of message.options[0].yarns">
           <li>{{ yarn }}</li>
         </ng-container>
-        <li>
-          or generally {{ message.options[0].yarnWeight }} weight yarn
-        </li>
+        or generally {{ message.options[0].yarnWeight }} weight yarn
       </ul>
       <h6>Gauge</h6>
       <p>

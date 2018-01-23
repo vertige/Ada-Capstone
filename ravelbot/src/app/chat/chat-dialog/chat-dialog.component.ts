@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { ChatService, Message, Prompt } from '../../chat.service';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/scan';
+// import { ScrollGlue } from 'angular2-scroll-glue';
 
 @Component({
   selector: 'chat-dialog',
   templateUrl: './chat-dialog.component.html',
-  styleUrls: ['./chat-dialog.component.css']
+  styleUrls: ['./chat-dialog.component.css'],
+  // directives: [ScrollGlue]
 })
 
 export class ChatDialogComponent implements OnInit {
@@ -41,5 +43,9 @@ export class ChatDialogComponent implements OnInit {
 
   tempClear() {
     this.chat.resetPrompts();
+  }
+
+  goToURL(variable) {
+    window.open(`https://www.weavingworks.com/products/${variable}`, "_blank");
   }
 }

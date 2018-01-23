@@ -1,4 +1,5 @@
-<h1>RavelBot</h1>
+<div id="wrapper">
+<h1 id="header">RavelBot</h1>
 <section id="chat-messages">
 <ng-container *ngFor="let message of messages | async">
   <div class="message" [ngClass]="{ 'from': message.sentBy === 'bot',
@@ -62,7 +63,8 @@
 
   <ng-container *ngIf="(this.currentPrompts | async).length > 0">
     <ng-container *ngFor="let prompt of (currentPrompts | async)">
-      <button (click)="this[prompt.action]()">{{prompt.text}}</button>
+      <button (click)="this[prompt.action](prompt.variable)">{{prompt.text}}</button>
     </ng-container>
   </ng-container>
 </section>
+</div>

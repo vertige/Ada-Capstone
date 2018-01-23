@@ -115,7 +115,7 @@ export class ChatService {
           if (productArray.length > 0) {
             let name = productArray[0];
             let handle = productArray[1];
-            options.unshift(new Prompt(`Shop for ${name}`, 'goToURL', handle);
+            options.unshift(new Prompt(`Shop for ${name}`, 'goToURL', handle));
           }
         });
 
@@ -157,22 +157,6 @@ export class ChatService {
     return pattern;
   };
 
-  // async makePrompt(yarn, arrayOptions) {
-  //   let params = new HttpParams();
-  //   params = params.set('title', yarn);
-  //
-  //
-  //   try {
-  //     let response = await this.http.get(this.SHOPIFY_URL, { params, responseType: 'text' }).take(1).toPromise()
-  //     .then(
-  //       console.log(JSON.parse(response));
-  //       arrayOptions.push(new Prompt(JSON.parse(response).products[0].handle), 'tempClear');
-  //     );
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
   getYarnURL(yarn) {
     let params = new HttpParams();
     params = params.set('title', yarn);
@@ -187,13 +171,6 @@ export class ChatService {
       }
     });
   }
-
-  findYarn(name) {
-    let params = new HttpParams();
-    params = params.set('title', name);
-    console.log('you called??! find Yarn');
-    return this.http.get(this.SHOPIFY_URL, { params, responseType: 'text' })
-  };
 
   resetPrompts() {
     this.prompts.next([]);

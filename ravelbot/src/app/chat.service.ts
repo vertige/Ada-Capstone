@@ -44,7 +44,7 @@ export class ChatService {
       let action = parsedResponse.action;
       let options = parsedResponse.attachments;
       if (action == 'listPatterns' && parsedResponse.attachments.length == 0) { //no results found
-        this.postMessage(`I'm sorry, there were no results for "${parsedResponse.entity}"`, 'bot');
+        this.postMessage(`I'm sorry, there were no results on Ravelry for "${parsedResponse.entity}"`, 'bot');
       } else {
       this.postMessage(replyText, 'bot', action, options);
       console.log(parsedResponse);
@@ -112,13 +112,18 @@ export class ChatService {
 
       let options = [];
 
+      const weight = this.findWeight(patternDetails.weight)
+      if (weight) {
+        const handle = `collections/yarn-${weight}`;
+        options.push(new Prompt(`Shop for ${weight} weight yarns`, 'goToURL', handle));
+      }
+
       // get prompts
       for (let yarn of patternDetails.yarns) {
-        // this.makePrompt(yarn, options);
         this.getYarnURL(yarn).then((productArray) => {
           if (productArray.length > 0) {
             let name = productArray[0];
-            let handle = productArray[1];
+            let handle = `products/${productArray[1]}`;
             options.unshift(new Prompt(`Shop for ${name}`, 'goToURL', handle));
           }
         });
@@ -140,11 +145,32 @@ export class ChatService {
     // this.triggerBotEvent(eventData);
   };
 
+  findWeight(weight) {
+    console.log(weight);
+    const weights = {
+      'Thread': 'lace',
+      'Cobweb': 'lace',
+      'Lace': 'lace',
+      'Light Fingering': 'fingering',
+      'Fingering': 'fingering',
+      'Sport': 'sport',
+      'DK': 'dk',
+      'Worsted': 'worsted-aran',
+      'Aran': 'worsted-aran',
+      'Bulky': 'bulky',
+      'Super Bulky': 'bulky',
+      'Jumbo': 'bulky',
+    };
+    if (weights[weight]) {
+      return weights[weight];
+    }
+  };
+
   parsePattern(response) {
     let pattern = {
       title: response.name,
       designer: response.pattern_author.name,
-      imgURL: response.photos[0].small2_url,
+      imgURL: response.photos[0].medium2_url,
       // id:response.id,
       // gauge: response.gauge,
       gaugeNotes: response.gauge_description,
@@ -152,6 +178,7 @@ export class ChatService {
       yarns: [],
       yardage: response.yardage_description,
       yarnWeight: response.yarn_weight_description,
+      weight: response.yarn_weight.name,
     };
     for (let pack of response.packs) {
       const name = pack.yarn_name;

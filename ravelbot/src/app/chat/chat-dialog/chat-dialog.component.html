@@ -1,15 +1,12 @@
 <div id="wrapper">
-<h1 id="header">RavelBot</h1>
-<section id="chatMessages" >
-<ng-container id="messages" *ngFor="let message of messages | async">
-  <div scrollTo class="message" [ngClass]="{ 'from': message.sentBy === 'bot',
-  'to':   message.sentBy === 'user',
-  'selection': message.sentBy === 'selected' }">
-    {{ message.content }}
-  </div>
-  <!-- <div scrollTo>
-
-  </div> -->
+  <h1 id="header">RavelBot</h1>
+  <section id="chatMessages" >
+    <ng-container id="messages" *ngFor="let message of messages | async">
+      <div scrollTo class="message" [ngClass]="{ 'from': message.sentBy === 'bot',
+      'to':   message.sentBy === 'user',
+      'selection': message.sentBy === 'selected' }">
+      {{ message.content }}
+    </div>
 
   <ng-container *ngIf="message.action === 'listPatterns'">
     <div class="message from">
@@ -17,10 +14,10 @@
         <ng-container *ngFor="let option of message.options">
           <tr (click)="formValue=option; selectOption()">
             <td>
-              <img src={{option.imgURL}} />
+              <img class="small" src={{option.imgURL}} />
             </td>
             <td>
-              <h5><a>{{ option.title }}</a></h5> by {{option.designer}}
+              <h5 class="inline"><a>{{ option.title }}</a></h5> by {{option.designer}}
             </td>
           </tr>
         </ng-container> <!-- end of options loop -->
@@ -30,26 +27,34 @@
 
   <ng-container *ngIf="message.action === 'showPattern'">
     <div class="message from">
-      <h5>{{ message.options[0].title}}</h5>
-      <p>
-        by {{ message.options[0].designer }}
-      </p>
-      <img src={{message.options[0].imgURL}} />
-      <h6>Yardage</h6>
-      <p>
-        {{ message.options[0].yardage }}
-      </p>
-      <h6>Suggested Yarn(s)</h6>
-      <ul>
-        <ng-container *ngFor="let yarn of message.options[0].yarns">
-          <li>{{ yarn }}</li>
-        </ng-container>
-        or generally {{ message.options[0].yarnWeight }} weight yarn
-      </ul>
-      <h6>Gauge</h6>
-      <p>
-        {{ message.options[0].gaugeNotes }}
-      </p>
+      <table>
+        <tr>
+          <td>
+            <h4 class="inline">{{ message.options[0].title}}</h4>  by {{ message.options[0].designer }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <h5>Yardage</h5>
+            {{ message.options[0].yardage }}
+            <h5 class="block">Suggested Yarn(s)</h5>
+              <ul>
+                <ng-container *ngIf="message.options[0].yarns[0] != null">
+                <ng-container *ngFor="let yarn of message.options[0].yarns">
+                  <li>{{ yarn }}</li>
+                </ng-container>
+              </ng-container>
+              <li>generic yarn weight: {{ message.options[0].yarnWeight }}</li>
+            </ul>
+            <h5>Gauge</h5>
+            {{ message.options[0].gaugeNotes }}
+          </td>
+          <td>
+            <img class="medium" src={{message.options[0].imgURL}} />
+          </td>
+        </tr>
+      </table>
+
     </div>
   </ng-container> <!-- end of listPatterns -->
 </ng-container> <!-- end of message of messages loop -->
@@ -58,7 +63,7 @@
 <section id="user-input">
   <ng-container *ngIf="(this.currentPrompts | async).length == 0">
     <label for="nameField">Your Message</label>
-    <input [(ngModel)]="formValue" (keyup.enter)="sendMessage()" type="text">
+    <input focushere [(ngModel)]="formValue" (keyup.enter)="sendMessage()" type="text">
     <button (click)="sendMessage()">Send</button>
   </ng-container>
 

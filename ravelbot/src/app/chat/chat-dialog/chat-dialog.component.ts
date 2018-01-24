@@ -1,4 +1,4 @@
-import { Component, OnInit, Directive, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, OnInit, Directive, AfterViewInit, ElementRef, Input } from '@angular/core';
 import { ChatService, Message, Prompt } from '../../chat.service';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/scan';
@@ -12,6 +12,22 @@ export class ScrollToDirective implements AfterViewInit {
   ngAfterViewInit() {
     this.elRef.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+}
+
+@Directive({
+    selector: '[focushere]',
+})
+export class AutofocusDirective implements OnInit {
+    private _autofocus;
+    constructor(private el: ElementRef) {}
+    ngOnInit() {
+      if (this._autofocus || typeof this._autofocus === "undefined") {
+        this.el.nativeElement.focus();
+      }
+    }
+    @Input() set autofocus(condition: boolean)  {
+      this._autofocus = condition != false;
+    }
 }
 
 @Component({
@@ -67,6 +83,6 @@ export class ChatDialogComponent implements OnInit {
   }
 
   goToURL(variable) {
-    window.open(`https://www.weavingworks.com/products/${variable}`, "_blank");
+    window.open(`https://www.weavingworks.com/${variable}`, "_blank");
   }
 }

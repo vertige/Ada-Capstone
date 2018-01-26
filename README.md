@@ -1,7 +1,10 @@
 # RavelBot
 #### Capstone Project for Ada Developers Academy Cohort 8
 
-Video
+## Demo Video
+
+[![Link to YouTube Demo of RavelBot](https://img.youtube.com/vi/VID/0.jpg)](https://www.youtube.com/watch?v=IwsECsYnndE)
+
 
 ## Overview
 This is the beginning of a chatbot (RavelBot) who will help bridge the gap between yarn enthusiasts' purchase of project patterns via Ravelry.com and acquiring requisite supplies via The Weaving Works, a yarn store store transitioning from established local yarn shop to online retailer.

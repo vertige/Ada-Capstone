@@ -3,7 +3,7 @@
 
 ## Demo Video
 
-[![Link to YouTube Demo of RavelBot](https://img.youtube.com/vi/VID/0.jpg)](https://www.youtube.com/watch?v=IwsECsYnndE)
+[![Link to YouTube Demo of RavelBot](https://img.youtube.com/vi/IwsECsYnndE/0.jpg)](https://www.youtube.com/watch?v=IwsECsYnndE)
 
 
 ## Overview

@@ -43,6 +43,7 @@ exports.dialogflowProxy = functions.https.onRequest((request, response) => {
               imgURL: pattern.first_photo.small_url,
               id: `${pattern.id}`,
               designer: pattern.designer.name,
+              handle: `https://www.ravelry.com/products/library/${pattern.permalink}`,
             });
           }
           return responseObject;
